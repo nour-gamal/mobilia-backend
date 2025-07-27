@@ -1,7 +1,28 @@
 import { Router } from "express";
 import { Category } from "../models/categories.ts";
+import {
+	CATEGORY_IMAGE_NAME,
+	CATEGORY_IMAGE_UPLOAD_PATH,
+} from "../constants/constants.ts";
+import multer from "multer";
 
 const categoriesRouter = Router();
+const upload = multer({
+	storage: multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, CATEGORY_IMAGE_UPLOAD_PATH);
+		},
+		filename: (req, file, cb) => {
+			console.log(file);
+			cb(null, `${Date.now()}-${file.originalname}`);
+		},
+	}),
+	fileFilter: (req, file, cb) => {
+		if (!file.mimetype.includes("image")) {
+			return cb(new Error("Only images are allowed") as any, false);
+		} else return cb(null, true);
+	},
+}); // Configure multer for file uploads
 
 categoriesRouter.get("/", async (req, res) => {
 	try {
@@ -92,4 +113,36 @@ categoriesRouter.delete("/:id", async (req, res) => {
 		res.status(500).json({ message: "Internal server error" });
 	}
 });
+categoriesRouter.post(
+	"/upload/categoryImg/:categoryId",
+	upload.single(CATEGORY_IMAGE_NAME),
+	async (req, res) => {
+		try {
+			const { categoryId } = req.params;
+
+			if (!categoryId) {
+				return res.status(400).json({ message: "Category ID is required" });
+			}
+
+			const category = await Category.findById(categoryId);
+
+			if (!category) {
+				return res.status(404).json({ message: "Category not found" });
+			} else if (!req.file) {
+				return res.status(400).json({ message: "No file uploaded" });
+			}
+
+			category.image = req.file.filename;
+			category.updatedAt = new Date();
+			await category.save();
+			res.status(200).json({
+				message: "category image uploaded successfully",
+				status: 200,
+			});
+		} catch (error) {
+			console.error("Error uploading file:", error);
+			res.status(500).json({ message: "Internal server error" });
+		}
+	}
+);
 export default categoriesRouter;

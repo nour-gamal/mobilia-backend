@@ -5,6 +5,7 @@ const CategorySchema = new Schema<ICategory>(
 	{
 		name: { type: String, required: true, unique: true },
 		description: { type: String, default: "" },
+		image: { type: String, default: "" },
 		createdAt: { type: Date, default: Date.now },
 		updatedAt: { type: Date, default: Date.now },
 	},
