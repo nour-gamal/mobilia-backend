@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
-// ...existing code...
+
 const PORT = process.env.PORT || 3001;
 app.use(express.json());
 app.use("/api/categories", categoriesRouter);

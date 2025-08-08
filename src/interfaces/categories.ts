@@ -1,9 +1,9 @@
 import { Document } from "mongoose";
 
 export interface ICategory extends Document {
-	name: string;
-	description?: string;
-	image?: string;
+	stdTitle: string;
+	stdDescription?: string;
+	imageSrc?: string;
 	createdAt: Date;
 	updatedAt: Date;
 }

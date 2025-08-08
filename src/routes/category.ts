@@ -13,7 +13,6 @@ const upload = multer({
 			cb(null, CATEGORY_IMAGE_UPLOAD_PATH);
 		},
 		filename: (req, file, cb) => {
-			console.log(file);
 			cb(null, `${Date.now()}-${file.originalname}`);
 		},
 	}),
@@ -53,12 +52,12 @@ categoriesRouter.get("/:id", async (req, res) => {
 
 categoriesRouter.post("/", async (req, res) => {
 	try {
-		const { name, description } = req.body;
-		if (!name) {
-			return res.status(400).json({ message: "Name is required" });
+		const { stdTitle, stdDescription } = req.body;
+		if (!stdTitle) {
+			return res.status(400).json({ message: "stdTitle is required" });
 		}
 
-		const newCategory = new Category({ name, description });
+		const newCategory = new Category({ stdTitle, stdDescription });
 		await newCategory.save();
 		res.status(201).json({ data: newCategory, status: 201 });
 	} catch (error) {
@@ -69,20 +68,20 @@ categoriesRouter.post("/", async (req, res) => {
 categoriesRouter.put("/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const { name, description } = req.body;
+		const { stdTitle, stdDescription } = req.body;
 		if (!id) {
 			return res.status(400).json({ message: "Category ID is required" });
-		} else if (!(name || description)) {
-			return res
-				.status(400)
-				.json({ message: "Please provide Name or description to be updated" });
+		} else if (!(stdTitle || stdDescription)) {
+			return res.status(400).json({
+				message: "Please provide stdTitle or stdDescription to be updated",
+			});
 		}
 		const category = await Category.findById(id);
 		if (!category) {
 			return res.status(404).json({ message: "Category not found" });
 		}
-		category.name = name;
-		category.description = description;
+		category.stdTitle = stdTitle;
+		category.stdDescription = stdDescription;
 		await category.save();
 		res.status(200).json({
 			data: category,
@@ -132,7 +131,7 @@ categoriesRouter.post(
 				return res.status(400).json({ message: "No file uploaded" });
 			}
 
-			category.image = req.file.filename;
+			category.imageSrc = req.file.filename;
 			category.updatedAt = new Date();
 			await category.save();
 			res.status(200).json({

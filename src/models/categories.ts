@@ -3,9 +3,9 @@ import mongoose, { Schema } from "mongoose";
 
 const CategorySchema = new Schema<ICategory>(
 	{
-		name: { type: String, required: true, unique: true },
-		description: { type: String, default: "" },
-		image: { type: String, default: "" },
+		stdTitle: { type: String, required: true, unique: true },
+		stdDescription: { type: String, default: "" },
+		imageSrc: { type: String, default: "" },
 		createdAt: { type: Date, default: Date.now },
 		updatedAt: { type: Date, default: Date.now },
 	},
